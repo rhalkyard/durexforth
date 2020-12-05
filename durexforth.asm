@@ -25,9 +25,19 @@
 !cpu 6510
 !to "durexforth.prg", cbm	; set output file and format
 
-* = $801
+; C128
+*     = $1c01
 
-!byte $b, $08, $a, 0, $9E, $32, $30, $36, $31, 0, 0, 0 ; basic header
+; C64
+;*         = $0801
+
+!byte $b, $08, $a, 0 
+!byte $9E ; SYS
+!byte '0' + entry % 10000 / 1000 ; entrypoint address as decimal digits       
+!byte '0' + entry %  1000 /  100        
+!byte '0' + entry %   100 /   10        
+!byte '0' + entry %    10
+!byte 0, 0, 0 ; end BASIC
 
 ;; Word flags
 F_IMMEDIATE = $80
@@ -74,7 +84,7 @@ PLACEHOLDER_ADDRESS = $1234
 !ct pet
 
 ; -------- program start
-
+entry
     lda 1
     pha
     lda $318
@@ -89,8 +99,11 @@ PLACEHOLDER_ADDRESS = $1234
 
     jsr PAGE
 
-    lda	#%00010110 ; lowercase
-    sta	$d018
+    ; lda	#%00010110 ; lowercase
+    ; sta	$d018
+
+    lda #14
+    jsr PUTCHR
 
 _START = * + 1
     jsr load_base
@@ -187,4 +200,4 @@ load_base
 
 basename
 !text	"base"
-basename_end
+basename_end    

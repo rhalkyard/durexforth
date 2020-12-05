@@ -35,7 +35,7 @@ quit_reset
     cli
 
     ; lores
-    lda #$9b
+    lda #$1b
     sta $d011
     lda #$17
     sta $dd00
@@ -51,12 +51,23 @@ quit_reset
     lda #>TIB
     sta TIB_PTR + 1
 
-    lda #$36 ; ram + i/o + kernal
-    sta 1
+;    lda #$36 ; ram + i/o + kernal
+;    sta 1
+
+    sei
+    ; bank out BASIC ROM
+    lda #%00001110
+    sta $ff00
+    
+    ; tell Kernal IRQ routines not to call BASIC IRQs
+    lda $a04
+    and #%11111110
+    sta $a04
+    cli
 
     ; Yellow text.
     lda #7
-    sta $286
+    sta $f1 ; $286
 
     ; Clears color area.
 -   sta $d800, x

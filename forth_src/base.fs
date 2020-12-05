@@ -220,11 +220,11 @@ marker ---modules---
 .( v..) include v
 
 decimal
-include turnkey 
+include turnkey
 cr
 .( cart: )
 $4000 $68 -
-here $801 - top latest -
+here $1c01 - top latest -
 $21 + + -
 . .( bytes remain.) cr
 

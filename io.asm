@@ -51,7 +51,9 @@ TYPE ; ( caddr u -- )
     jmp -
 
     +BACKLINK "key?", 4
-    lda $c6 ; Number of characters in keyboard buffer
+    lda $d1
+    bne .pushtrue
+    lda $d0  ; $c6 Number of characters in keyboard buffer
     beq +
 .pushtrue
     lda #$ff
@@ -59,10 +61,12 @@ TYPE ; ( caddr u -- )
     jmp pushya
 
     +BACKLINK "key", 3
--   lda $c6
+    lda $d1
+    bne +
+-   lda $d0 ; $c6
     beq -
-    stx W
-    jsr $e5b4 ; Get character from keyboard buffer
++   stx W
+    jsr $c006 ;$e5b4 ; Get character from keyboard buffer
     ldx W
     ldy #0
     jmp pushya
@@ -102,7 +106,7 @@ READ_EOF = * + 1
 .getLineFromConsole
     stx W
     ldx #0
--   jsr $e112 ; Input Character
+-   jsr $ffcf ;$e112 ; Input Character
     cmp #$d
     beq .gotReturn
     sta TIB,x

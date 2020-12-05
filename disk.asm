@@ -22,6 +22,7 @@
 
 ; DEVICE OPENW CLOSEW LOADB SAVEB INCLUDED
 
+SETBNK = $f73f
 READST = $ffb7
 SETLFS = $ffba
 SETNAM = $ffbd
@@ -106,6 +107,10 @@ LOADB
     txa
     pha
 
+    lda #0
+    ldx #0
+    jsr SETBNK
+
     lda MSB, x		; >destination
     sta load_binary_laddr_hi
     lda LSB, x		; <destination
@@ -187,6 +192,12 @@ load_binary_laddr_hi = *+1
 SAVEB
     stx W
 
+    lda #0
+    ldx #0
+    jsr SETBNK
+
+    ldx W
+
     lda	$ae
     pha
     lda	$af
@@ -235,6 +246,16 @@ save_binary_srange_end_hi = *+1
 ; OPENW ( strptr strlen file# ) open file for writing
     +BACKLINK "openw", 5
 OPENW
+    txa
+    pha
+
+    lda #0
+    ldx #0
+    jsr SETBNK
+
+    pla
+    tax
+
     lda LSB,x
     sta W ; fileno
     stx	W2
@@ -309,6 +330,10 @@ INCLUDED
 
     txa
     pha
+
+    lda #0
+    ldx #0
+    jsr SETBNK
 
 .filelen = * + 1
     lda #0
