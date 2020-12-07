@@ -40,7 +40,7 @@ msb ldy,x w 1+ sty,
 0 ldy,#
 here w lda,(y)
 0 cmp,# foundeol -branch beq,
-$e716 jsr, iny, \ putchar
+$ffd2 jsr, iny, \ putchar
 $d cmp,# foundeol -branch beq, jmp,
 
 \ nb: may return eof
@@ -75,11 +75,14 @@ $400 + ( addr ) ;
 : sol 0 curx ! ;
 
 \ ram + io + kernal rom
+\ skip on c128
 code rom-kernal
-$36 lda,# 1 sta, ;code
+\ $36 lda,# 1 sta, 
+;code
 \ ram + io + ram
 code ram-kernal
-$35 lda,# 1 sta, ;code
+\ $35 lda,# 1 sta, 
+;code
 
 : reset-buffer
 0 bufstart 1- c!
@@ -192,8 +195,17 @@ or advance-cur or until ;
 begin advance-cur editpos 1+ dup
 eof= swap c@ space= or or until ;
 
-: setcur ( x y -- )
-xr ! yr ! $e50c sys ;
+\ : setcur ( x y -- )
+\ xr ! yr ! $fff0 [ clc, ] sys ;
+
+\ SYS doesn't work yet on the 128
+\ this code works on both 64 and 128
+code setcur ( x y -- )
+lsb lda,x inx, lsb ldy,x inx,
+w stx, tax,
+clc, $fff0 jsr, \ PLOT, 
+w ldx,
+;code
 
 : refresh-line
 cury @ $28 * $400 + $28 bl fill
@@ -619,12 +631,15 @@ curlinestart @ bufstart eof @ within
 
 define v
 \ modifies kernal to change kbd prefs
-ram-kernal $eaea @ $8ca <> if
+\ skip on 128
+( 
+  ram-kernal $eaea @ $8ca <> if
 rom-kernal
 $e000 dup $2000 move \ rom => ram
 $f $eaea c! \ repeat delay
 4 $eb1d c! \ repeat speed
 then
+)
 
 0 to insert
 $80 $28a c! \ key repeat on
