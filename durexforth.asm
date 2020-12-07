@@ -23,9 +23,10 @@
 ; ACME assembler
 
 !cpu 6510
-!to "durexforth.prg", cbm	; set output file and format
 
-!set TARGET = 128
+!ifdef TARGET {} else {
+!set TARGET = 64
+}
 
 !if TARGET = 128 {
 BASIC_START = $1c01

@@ -16,28 +16,50 @@ SEPARATOR_NAME1 = '=-=-=-=-=-=-=-=,s'
 SEPARATOR_NAME2 = '=-------------=,s'
 SEPARATOR_NAME3 = '=-=---=-=---=-=,s'
 
-all:	durexforth.d64
+all:	durexforth.d64 durexforth128.d64
 
-deploy: durexforth.d64 cart.asm
+deploy: durexforth.d64 durexforth128.d64 cart.asm
 	rm -rf deploy
 	mkdir deploy
 	$(MAKE) -C docs
 	cp docs/durexforth.pdf deploy/durexforth-$(TAG_DEPLOY).pdf
 	cp durexforth.d64 deploy/durexforth-$(TAG_DEPLOY).d64
-	x64 -warp +confirmexit deploy/durexforth-$(TAG_DEPLOY).d64
+	cp durexforth128.d64 deploy/durexforth128-$(TAG_DEPLOY).d64
+	x64 -warp +confirmonexit deploy/durexforth-$(TAG_DEPLOY).d64
+	x128 -warp +confirmonexit deploy/durexforth128-$(TAG_DEPLOY).d64
 	# make cartridge
 	c1541 -attach deploy/durexforth-$(TAG_DEPLOY).d64 -read durexforth
 	mv durexforth build/durexforth
-	@$(AS) cart.asm
+	$(AS) cart.asm
 	cartconv -t simon -i build/cart.bin -o deploy/durexforth-$(TAG_DEPLOY).crt -n "DUREXFORTH $(TAG_DEPLOY_DOT)"
 
 durexforth.prg: *.asm
-	@$(AS) durexforth.asm
+	$(AS) -DTARGET=64 -f cbm -o $@ durexforth.asm
+
+durexforth128.prg: *.asm
+	$(AS) -DTARGET=128 -f cbm -o $@ durexforth.asm
 
 durexforth.d64: durexforth.prg Makefile ext/petcom $(SRCS)
 	touch $(EMPTY_FILE)
 	$(C1541) -format "durexforth,DF"  d64 durexforth.d64 # > /dev/null
 	$(C1541) -attach $@ -write durexforth.prg durexforth # > /dev/null
+	$(C1541) -attach $@ -write $(EMPTY_FILE) $(SEPARATOR_NAME1) # > /dev/null
+	$(C1541) -attach $@ -write $(EMPTY_FILE) $(TAG_DEPLOY_DOT),s # > /dev/null
+	$(C1541) -attach $@ -write $(EMPTY_FILE) $(SEPARATOR_NAME2) # > /dev/null
+# $(C1541) -attach $@ -write debug.bak
+	mkdir -p build
+	echo -n "aa" > build/header
+	@for forth in $(SRC_NAMES); do\
+        cat build/header $(SRC_DIR)/$$forth.fs | ext/petcom - > build/$$forth.pet; \
+        $(C1541) -attach $@ -write build/$$forth.pet $$forth; \
+    done;
+	$(C1541) -attach $@ -write $(EMPTY_FILE) $(SEPARATOR_NAME3) # > /dev/null
+	rm -f $(EMPTY_FILE)
+
+durexforth128.d64: durexforth128.prg Makefile ext/petcom $(SRCS)
+	touch $(EMPTY_FILE)
+	$(C1541) -format "durexforth,DF"  d64 durexforth128.d64 # > /dev/null
+	$(C1541) -attach $@ -write durexforth128.prg durexforth # > /dev/null
 	$(C1541) -attach $@ -write $(EMPTY_FILE) $(SEPARATOR_NAME1) # > /dev/null
 	$(C1541) -attach $@ -write $(EMPTY_FILE) $(TAG_DEPLOY_DOT),s # > /dev/null
 	$(C1541) -attach $@ -write $(EMPTY_FILE) $(SEPARATOR_NAME2) # > /dev/null
