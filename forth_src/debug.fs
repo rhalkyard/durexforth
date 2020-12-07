@@ -97,8 +97,10 @@ last-dump ! base ! ;
 hide last-dump
 
 : more 
-$d6 c@ $18 = if $12 emit
-." more" $92 emit key drop page then ;
+$eb c@ $18 = if
+0 $f4 c! \ exit quoted state
+$12 emit ." more" $92 emit 
+key drop page then ;
 
 : (words) more name>string type space 1 ;
 : words ['] (words) dowords ;
