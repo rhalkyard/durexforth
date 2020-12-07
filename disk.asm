@@ -111,6 +111,10 @@ LOADB
     ldx #0
     jsr SETBNK
 
+    pla
+    pha
+    tax
+
     lda MSB, x		; >destination
     sta load_binary_laddr_hi
     lda LSB, x		; <destination
