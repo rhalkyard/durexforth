@@ -25,11 +25,13 @@
 !cpu 6510
 !to "durexforth.prg", cbm	; set output file and format
 
-; C128
-*     = $1c01
+!set TARGET = 128
 
-; C64
-;*         = $0801
+!if TARGET = 128 {
+* = $1c01
+} else {
+* = $0801
+}
 
 !byte $b, $08, $a, 0 
 !byte $9E ; SYS
@@ -72,11 +74,26 @@ OP_JSR = $20
 OP_RTS = $60
 OP_INX = $e8
 
+CHRIN = $ffcf
 PUTCHR = $ffd2 ; put char
 
 K_RETURN = $d
 K_CLRSCR = $93
 K_SPACE = ' '
+
+!if TARGET = 128 {
+NDX = $d0
+COLOR = $f1
+QTSW = $f4
+
+KEYIN = $c006
+} else {
+NDX = $c6
+QTSW = $d4
+COLOR = $286
+
+KEYIN = $e5b4
+}
 
 ; PLACEHOLDER_ADDRESS instances are overwritten using self-modifying code.
 PLACEHOLDER_ADDRESS = $1234
@@ -99,11 +116,13 @@ entry
 
     jsr PAGE
 
-    ; lda	#%00010110 ; lowercase
-    ; sta	$d018
-
+!if TARGET = 128 {
     lda #14
     jsr PUTCHR
+} else {
+    lda	#%00010110 ; lowercase
+    sta	$d018
+}
 
 _START = * + 1
     jsr load_base
@@ -172,6 +191,13 @@ ONE
 !src "io.asm"
 !src "lowercase.asm"
 !src "disk.asm"
+
+    +BACKLINK "native-c128?", 12
+!if TARGET = 128 {
+    +VALUE 1
+} else {
+    +VALUE 0
+}
 
 ; LATEST - points to the most recently defined dictionary word.
 

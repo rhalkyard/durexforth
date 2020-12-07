@@ -107,6 +107,7 @@ LOADB
     txa
     pha
 
+!if TARGET = 128 {
     lda #0
     ldx #0
     jsr SETBNK
@@ -114,6 +115,7 @@ LOADB
     pla
     pha
     tax
+}
 
     lda MSB, x		; >destination
     sta load_binary_laddr_hi
@@ -196,11 +198,13 @@ load_binary_laddr_hi = *+1
 SAVEB
     stx W
 
+!if TARGET = 128 {
     lda #0
     ldx #0
     jsr SETBNK
 
     ldx W
+}
 
     lda	$ae
     pha
@@ -250,6 +254,7 @@ save_binary_srange_end_hi = *+1
 ; OPENW ( strptr strlen file# ) open file for writing
     +BACKLINK "openw", 5
 OPENW
+!if TARGET = 128 {
     txa
     pha
 
@@ -259,6 +264,7 @@ OPENW
 
     pla
     tax
+}
 
     lda LSB,x
     sta W ; fileno
@@ -334,10 +340,12 @@ INCLUDED
 
     txa
     pha
-
+    
+!if TARGET = 128 {
     lda #0
     ldx #0
     jsr SETBNK
+}
 
 .filelen = * + 1
     lda #0

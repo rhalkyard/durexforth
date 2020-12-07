@@ -35,8 +35,16 @@ quit_reset
     cli
 
     ; lores
+!if TARGET = 128 {
     lda #0
     sta $d8
+} else {
+    lda #$9b
+    sta $d011
+    lda #$17
+    sta $dd00
+    sta $d018
+}
 
     txa
     pha
@@ -48,9 +56,7 @@ quit_reset
     lda #>TIB
     sta TIB_PTR + 1
 
-;    lda #$36 ; ram + i/o + kernal
-;    sta 1
-
+!if TARGET = 128 {
     sei
     ; bank out BASIC ROM
     lda #%00001110
@@ -61,10 +67,15 @@ quit_reset
     and #%11111110
     sta $a04
     cli
+} else {
+    lda #$36 ; ram + i/o + kernal
+    sta 1
+}
 
     ; Yellow text.
     lda #7
-    sta $f1 ; $286
+    sta COLOR
+
 
     ; Clears color area.
 -   sta $d800, x
