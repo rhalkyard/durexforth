@@ -35,11 +35,8 @@ quit_reset
     cli
 
     ; lores
-    lda #$1b
-    sta $d011
-    lda #$17
-    sta $dd00
-    sta $d018
+    lda #0
+    sta $d8
 
     txa
     pha
