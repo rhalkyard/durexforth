@@ -211,6 +211,7 @@ does> dup @ to here
 marker ---modules---
 
 .( wordlist..) include wordlist
+.( immedif..) include immedif
 .( labels..) include labels
 .( doloop..) include doloop
 .( sys..) include sys

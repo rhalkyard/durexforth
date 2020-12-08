@@ -74,15 +74,20 @@ $400 + ( addr ) ;
 
 : sol 0 curx ! ;
 
+native-c128? [if]
+: rom-kernal ;
+: ram-kernal ;
+[else]
 \ ram + io + kernal rom
 \ skip on c128
 code rom-kernal
-\ $36 lda,# 1 sta, 
+$36 lda,# 1 sta,
 ;code
 \ ram + io + ram
 code ram-kernal
-\ $35 lda,# 1 sta, 
+$35 lda,# 1 sta,
 ;code
+[then]
 
 : reset-buffer
 0 bufstart 1- c!
@@ -195,17 +200,20 @@ or advance-cur or until ;
 begin advance-cur editpos 1+ dup
 eof= swap c@ space= or or until ;
 
-\ : setcur ( x y -- )
-\ xr ! yr ! $fff0 [ clc, ] sys ;
-
+native-c128? [if]
 \ SYS doesn't work yet on the 128
 \ this code works on both 64 and 128
 code setcur ( x y -- )
 lsb lda,x inx, lsb ldy,x inx,
 w stx, tax,
-clc, $fff0 jsr, \ PLOT, 
+clc, $fff0 jsr, \ PLOT 
 w ldx,
 ;code
+[else]
+: setcur ( x y -- )
+xr ! yr ! $fff0 [ clc, ] sys ;
+[then]
+
 
 : refresh-line
 cury @ $28 * $400 + $28 bl fill
@@ -630,16 +638,17 @@ curlinestart @ bufstart eof @ within
 0= abort" cl" again ;
 
 define v
-\ modifies kernal to change kbd prefs
-\ skip on 128
-( 
-  ram-kernal $eaea @ $8ca <> if
+[ native-c128? ] [if]
+\ C128: 
+[else]
+\ C64: modify kernal to change kbd prefs
+ram-kernal $eaea @ $8ca <> if
 rom-kernal
 $e000 dup $2000 move \ rom => ram
 $f $eaea c! \ repeat delay
 4 $eb1d c! \ repeat speed
 then
-)
+[then]
 
 0 to insert
 $80 $28a c! \ key repeat on

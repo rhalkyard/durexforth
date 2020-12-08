@@ -96,9 +96,11 @@ last-dump ! base ! ;
 : n last-dump @ dump ;
 hide last-dump
 
-: more 
-$eb c@ $18 = if
-0 $f4 c! \ exit quoted state
+: more
+\ current cursor y pos
+[ native-c128? ]
+[if] $eb [else] $d6 [then] 
+c@ $18 = if 
 $12 emit ." more" $92 emit 
 key drop page then ;
 
