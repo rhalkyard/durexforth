@@ -20,7 +20,7 @@ start @ to oldstart
 top to oldtop 
 ['] restore-forth start ! 
 here $20 + top latest - + top!
-$1c01 top 1+ $d word count saveb ;
+basic-start top 1+ $d word count saveb ;
 
 : save-prg ( strptr strlen -- )
 here 0 , top to latest top!

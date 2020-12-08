@@ -28,10 +28,12 @@
 !set TARGET = 128
 
 !if TARGET = 128 {
-* = $1c01
+BASIC_START = $1c01
 } else {
-* = $0801
+BASIC_START = $0801
 }
+
+* = BASIC_START
 
 !byte $b, $08, $a, 0 
 !byte $9E ; SYS
@@ -191,6 +193,9 @@ ONE
 !src "io.asm"
 !src "lowercase.asm"
 !src "disk.asm"
+
+    +BACKLINK "basic-start", 11
+    +VALUE BASIC_START
 
     +BACKLINK "native-c128?", 12
 !if TARGET = 128 {
