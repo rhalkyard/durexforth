@@ -200,20 +200,8 @@ or advance-cur or until ;
 begin advance-cur editpos 1+ dup
 eof= swap c@ space= or or until ;
 
-native-c128? [if]
-\ SYS doesn't work yet on the 128
-\ this code works on both 64 and 128
-code setcur ( x y -- )
-lsb lda,x inx, lsb ldy,x inx,
-w stx, tax,
-clc, $fff0 jsr, \ PLOT 
-w ldx,
-;code
-[else]
 : setcur ( x y -- )
-xr ! yr ! $fff0 [ clc, ] sys ;
-[then]
-
+xr ! yr ! 0 sr ! $fff0 sys ;
 
 : refresh-line
 cury @ $28 * $400 + $28 bl fill
