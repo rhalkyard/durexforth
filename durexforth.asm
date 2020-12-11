@@ -88,12 +88,14 @@ K_SPACE = ' '
 NDX = $d0
 COLOR = $f1
 QTSW = $f4
+CASSETTEBUF = $0b00
 
 KEYIN = $c006
 } else {
 NDX = $c6
 QTSW = $d4
 COLOR = $286
+CASSETTEBUF = $033c
 
 KEYIN = $e5b4
 }
@@ -194,6 +196,9 @@ ONE
 !src "io.asm"
 !src "lowercase.asm"
 !src "disk.asm"
+
+    +BACKLINK "pad", 3
+    +VALUE CASSETTEBUF
 
     +BACKLINK "basic-start", 11
     +VALUE BASIC_START
