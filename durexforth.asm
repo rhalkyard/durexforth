@@ -84,13 +84,29 @@ K_RETURN = $d
 K_CLRSCR = $93
 K_SPACE = ' '
 
+CURRENT_LFN = $b8
+CURRENT_DEVICE = $ba
+LOADSAVE_ADDR = $c1
+LOADSAVE_END = $ae
+
+NMIVEC = $318
+
+VIC_CR1 = $d011
+VIC_ADDR = $d018
+VIC_BORDER = $d020
+VIC_BG1 = $d021
+CIA2_PRA = $dd00
+
 !if TARGET = 128 {
 NDX = $d0
+MACRO_NDX = $d1
+SCREEN_MODE = $d8
 COLOR = $f1
 QTSW = $f4
+INIT_STATUS = $0a04
 CASSETTEBUF = $0b00
-
 KEYIN = $c006
+MMUCR = $ff00
 } else {
 NDX = $c6
 QTSW = $d4
@@ -109,9 +125,9 @@ PLACEHOLDER_ADDRESS = $1234
 entry
     lda 1
     pha
-    lda $318
+    lda NMIVEC
     pha
-    lda $319
+    lda NMIVEC+1
     pha
     tsx
     stx INIT_S
@@ -126,7 +142,7 @@ entry
     jsr PUTCHR
 } else {
     lda	#%00010110 ; lowercase
-    sta	$d018
+    sta	VIC_ADDR
 }
 
 _START = * + 1
